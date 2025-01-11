@@ -1,5 +1,8 @@
+# Pokemon Database WebApp
 This is a "Dive Into World of Pokémon" Web project that based on Blazor web app, MSSQL Database and ASP.Net. This project purpose is basically give information about world-famous Pokémon Universe. In this website you can view and edit Pokémon species. In this card shaped view you can see Pokémon’s image, region, health, speed, attack, abilities, height, weight and level. You can see trainers and their bags that consist items. You can see elemental based moves and their combinations with trainers and Pokémons. Also you can see total Pokémon, Trainer and Region count. In Admin page, you can create, read, update and delete all of these elements. Additionally you can evolve Pokémon’s if its level is higher than 17. When you evolve it, its name changes to evolved form’s name. In Pokémon Statistics page, you can see 2 pie charts that show Pokémon distribution by region and  item distribution by region.
 Implementation Steps:
+
+## Usage
 
 1-	Create a database in MSSQL Server Management Studio with query that given below.
 
@@ -161,8 +164,6 @@ IV-	You can see your connection string in the properties window.
 
 7-  Do not update model from database as we fixed  recursion depth errors by some modifications to .cs files. When you update the model from databse, our modifications are reseted.
 
-Technical Difficulties and Choices of the Project: 
-When creating CRUD components for tables, Visual Studio didn't recongize our primary keys. So, we changed our primary keys names to ID. In this process we also realized that if we made our primary keys auto incremented, it is more practical.
-Our initial decision was to create triggers in MSSQL Server Management Studio that changed our derived attribute,number of Number_of_pokemons in a region when a new pokemon is created or an exiting pokemon is deleted. Howeever, we decided to implement a code for it in C# instead.
-We faced recursion depth errors. With necessary modifications to Cs files we fixed these errors.
-Main difficulty was that we have no educational background on this project except database part. 
+
+## Little Note
+This project is solely for the purpose of education. We want future computer engineering students to take inspiration from our project. We are just a couple of students who don't want to get sued by Nintendo.
