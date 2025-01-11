@@ -1,0 +1,166 @@
+﻿@page "/trainers/viewdetails"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Trainer Details</PageTitle>
+
+<div class="trainer-details-container">
+    @if (trainer is null)
+    {
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading trainer details...</p>
+                </div>
+    }
+    else
+    {
+                <div class="trainer-card">
+                    <div class="trainer-header">
+                        <h1>@trainer.Trainer_name</h1>
+                        <span class="trainer-class">@trainer.Trainer_class</span>
+                    </div>
+                    <div class="trainer-body">
+                        <div class="trainer-info">
+                            <p><strong>Team Badges:</strong> <span>@trainer.Team_Badges</span></p>
+                            <p><strong>Gender:</strong> <span>@trainer.Gender</span></p>
+                        </div>
+                    </div>
+                    <div class="trainer-footer">
+                        <a class="btn btn-secondary" href="/viewtrainers">Back to List</a>
+                    </div>
+                </div>
+    }
+</div>
+
+<style>
+    
+    .trainer-details-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+    }
+
+    
+    .loading-spinner {
+        text-align: center;
+    }
+
+    .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #4caf50;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s ease-in-out infinite;
+        margin: 20px auto;
+    }
+
+    .keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    
+    .trainer-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        width: 100%;
+        max-width: 600px;
+        transition: transform 0.3s ease;
+    }
+
+    .trainer-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .trainer-header {
+        background: #4caf50;
+        color: #fff;
+        text-align: center;
+        padding: 30px 20px;
+        position: relative;
+    }
+
+    .trainer-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+
+    .trainer-class {
+        font-size: 1.2rem;
+        font-weight: 300;
+        display: block;
+        margin-top: 10px;
+        opacity: 0.9;
+    }
+
+    .trainer-body {
+        padding: 20px;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .trainer-info p {
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .trainer-info strong {
+        color: #333;
+    }
+
+    .trainer-footer {
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    
+    .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary {
+        background: #3498db;
+        color: white;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary:hover {
+        background: #2980b9;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-3px);
+    }
+</style>
+
+@code {
+    private Trainer? trainer;
+
+    [SupplyParameterFromQuery]
+    private int TrainerId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trainer = await context.Trainer.FirstOrDefaultAsync(m => m.TrainerId == TrainerId);
+
+        if (trainer is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

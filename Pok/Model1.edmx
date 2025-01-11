@@ -1,0 +1,578 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="PokemonModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Carries">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TrainerId" Type="int" Nullable="false" />
+          <Property Name="ItemId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Evolution">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PokemonId" Type="int" Nullable="false" />
+          <Property Name="Evolved_form" Type="varchar" MaxLength="25" />
+          <Property Name="Evolution_condition" Type="varchar" MaxLength="55" />
+        </EntityType>
+        <EntityType Name="Item">
+          <Key>
+            <PropertyRef Name="ItemId" />
+          </Key>
+          <Property Name="ItemId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ItemName" Type="varchar" MaxLength="25" Nullable="false" />
+          <Property Name="Effect" Type="varchar" MaxLength="30" />
+          <Property Name="Type_of_item" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="RegionId" Type="int" />
+        </EntityType>
+        <EntityType Name="Move">
+          <Key>
+            <PropertyRef Name="MoveId" />
+          </Key>
+          <Property Name="MoveId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Move_name" Type="varchar" MaxLength="25" />
+          <Property Name="Description" Type="varchar" MaxLength="35" />
+          <Property Name="Types" Type="varchar" MaxLength="20" />
+          <Property Name="overallStat" Type="int" />
+        </EntityType>
+        <EntityType Name="Pokemon">
+          <Key>
+            <PropertyRef Name="PokemonId" />
+          </Key>
+          <Property Name="PokemonId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Pokemon_name" Type="varchar" MaxLength="25" />
+          <Property Name="RegionId" Type="int" />
+          <Property Name="Health" Type="int" />
+          <Property Name="Speed" Type="int" />
+          <Property Name="Attack" Type="int" />
+          <Property Name="Abilities" Type="varchar" MaxLength="20" />
+          <Property Name="Height_weight" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="Level" Type="int" />
+        </EntityType>
+        <EntityType Name="Region">
+          <Key>
+            <PropertyRef Name="RegionId" />
+          </Key>
+          <Property Name="RegionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RegionName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Number_of_pokemons" Type="int" />
+          <Property Name="Region_type" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="Trainer">
+          <Key>
+            <PropertyRef Name="TrainerId" />
+          </Key>
+          <Property Name="TrainerId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Trainer_name" Type="varchar" MaxLength="35" />
+          <Property Name="Trainer_class" Type="varchar" MaxLength="20" />
+          <Property Name="Team_Badges" Type="varchar" MaxLength="25" />
+          <Property Name="Gender" Type="char" MaxLength="1" Nullable="false" />
+        </EntityType>
+        <EntityType Name="USES">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TrainerId" Type="int" Nullable="false" />
+          <Property Name="MoveId" Type="int" Nullable="false" />
+          <Property Name="PokemonId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__Carries__ItemId__48CFD27E">
+          <End Role="Item" Type="Self.Item" Multiplicity="1" />
+          <End Role="Carries" Type="Self.Carries" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Item">
+              <PropertyRef Name="ItemId" />
+            </Principal>
+            <Dependent Role="Carries">
+              <PropertyRef Name="ItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Carries__Trainer__47DBAE45">
+          <End Role="Trainer" Type="Self.Trainer" Multiplicity="1" />
+          <End Role="Carries" Type="Self.Carries" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainer">
+              <PropertyRef Name="TrainerId" />
+            </Principal>
+            <Dependent Role="Carries">
+              <PropertyRef Name="TrainerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Evolution__Pokem__4CA06362">
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="1" />
+          <End Role="Evolution" Type="Self.Evolution" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pokemon">
+              <PropertyRef Name="PokemonId" />
+            </Principal>
+            <Dependent Role="Evolution">
+              <PropertyRef Name="PokemonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Item__RegionId__3F466844">
+          <End Role="Region" Type="Self.Region" Multiplicity="0..1" />
+          <End Role="Item" Type="Self.Item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="RegionId" />
+            </Principal>
+            <Dependent Role="Item">
+              <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Pokemon__RegionI__440B1D61">
+          <End Role="Region" Type="Self.Region" Multiplicity="0..1" />
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="RegionId" />
+            </Principal>
+            <Dependent Role="Pokemon">
+              <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__MoveId__5165187F">
+          <End Role="Move" Type="Self.Move" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Move">
+              <PropertyRef Name="MoveId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="MoveId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__PokemonId__52593CB8">
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pokemon">
+              <PropertyRef Name="PokemonId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="PokemonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__TrainerId__5070F446">
+          <End Role="Trainer" Type="Self.Trainer" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainer">
+              <PropertyRef Name="TrainerId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="TrainerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PokemonModelStoreContainer">
+          <EntitySet Name="Carries" EntityType="Self.Carries" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Evolution" EntityType="Self.Evolution" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Item" EntityType="Self.Item" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Move" EntityType="Self.Move" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pokemon" EntityType="Self.Pokemon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Region" EntityType="Self.Region" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Trainer" EntityType="Self.Trainer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="USES" EntityType="Self.USES" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Carries__ItemId__48CFD27E" Association="Self.FK__Carries__ItemId__48CFD27E">
+            <End Role="Item" EntitySet="Item" />
+            <End Role="Carries" EntitySet="Carries" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Carries__Trainer__47DBAE45" Association="Self.FK__Carries__Trainer__47DBAE45">
+            <End Role="Trainer" EntitySet="Trainer" />
+            <End Role="Carries" EntitySet="Carries" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Evolution__Pokem__4CA06362" Association="Self.FK__Evolution__Pokem__4CA06362">
+            <End Role="Pokemon" EntitySet="Pokemon" />
+            <End Role="Evolution" EntitySet="Evolution" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Item__RegionId__3F466844" Association="Self.FK__Item__RegionId__3F466844">
+            <End Role="Region" EntitySet="Region" />
+            <End Role="Item" EntitySet="Item" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Pokemon__RegionI__440B1D61" Association="Self.FK__Pokemon__RegionI__440B1D61">
+            <End Role="Region" EntitySet="Region" />
+            <End Role="Pokemon" EntitySet="Pokemon" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__MoveId__5165187F" Association="Self.FK__USES__MoveId__5165187F">
+            <End Role="Move" EntitySet="Move" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__PokemonId__52593CB8" Association="Self.FK__USES__PokemonId__52593CB8">
+            <End Role="Pokemon" EntitySet="Pokemon" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__TrainerId__5070F446" Association="Self.FK__USES__TrainerId__5070F446">
+            <End Role="Trainer" EntitySet="Trainer" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PokemonModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Carries">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TrainerId" Type="Int32" Nullable="false" />
+          <Property Name="ItemId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Item" Relationship="Self.FK__Carries__ItemId__6FE99F9F" FromRole="Carries" ToRole="Item" />
+          <NavigationProperty Name="Trainer" Relationship="Self.FK__Carries__Trainer__6EF57B66" FromRole="Carries" ToRole="Trainer" />
+        </EntityType>
+        <EntityType Name="Evolution">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PokemonId" Type="Int32" Nullable="false" />
+          <Property Name="Evolved_form" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="Evolution_condition" Type="String" MaxLength="55" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Pokemon" Relationship="Self.FK__Evolution__Pokem__73BA3083" FromRole="Evolution" ToRole="Pokemon" />
+        </EntityType>
+        <EntityType Name="Item">
+          <Key>
+            <PropertyRef Name="ItemId" />
+          </Key>
+          <Property Name="ItemId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ItemName" Type="String" MaxLength="25" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Effect" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Type_of_item" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RegionId" Type="Int32" />
+          <NavigationProperty Name="Carries" Relationship="Self.FK__Carries__ItemId__6FE99F9F" FromRole="Item" ToRole="Carries" />
+          <NavigationProperty Name="Region" Relationship="Self.FK__Item__RegionId__66603565" FromRole="Item" ToRole="Region" />
+        </EntityType>
+        <EntityType Name="Move">
+          <Key>
+            <PropertyRef Name="MoveId" />
+          </Key>
+          <Property Name="MoveId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Move_name" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="Types" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="overallStat" Type="Int32" />
+          <NavigationProperty Name="USES" Relationship="Self.FK__USES__MoveId__787EE5A0" FromRole="Move" ToRole="USES" />
+        </EntityType>
+        <EntityType Name="Pokemon">
+          <Key>
+            <PropertyRef Name="PokemonId" />
+          </Key>
+          <Property Name="PokemonId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Pokemon_name" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="RegionId" Type="Int32" />
+          <Property Name="Health" Type="Int32" />
+          <Property Name="Speed" Type="Int32" />
+          <Property Name="Attack" Type="Int32" />
+          <Property Name="Abilities" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Height_weight" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="Level" Type="Int32" />
+          <NavigationProperty Name="Evolution" Relationship="Self.FK__Evolution__Pokem__73BA3083" FromRole="Pokemon" ToRole="Evolution" />
+          <NavigationProperty Name="Region" Relationship="Self.FK__Pokemon__RegionI__6B24EA82" FromRole="Pokemon" ToRole="Region" />
+          <NavigationProperty Name="USES" Relationship="Self.FK__USES__PokemonId__797309D9" FromRole="Pokemon" ToRole="USES" />
+        </EntityType>
+        <EntityType Name="Region">
+          <Key>
+            <PropertyRef Name="RegionId" />
+          </Key>
+          <Property Name="RegionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RegionName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Number_of_pokemons" Type="Int32" />
+          <Property Name="Region_type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Item" Relationship="Self.FK__Item__RegionId__66603565" FromRole="Region" ToRole="Item" />
+          <NavigationProperty Name="Pokemon" Relationship="Self.FK__Pokemon__RegionI__6B24EA82" FromRole="Region" ToRole="Pokemon" />
+        </EntityType>
+        <EntityType Name="Trainer">
+          <Key>
+            <PropertyRef Name="TrainerId" />
+          </Key>
+          <Property Name="TrainerId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Trainer_name" Type="String" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="Trainer_class" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Team_Badges" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="Gender" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Carries" Relationship="Self.FK__Carries__Trainer__6EF57B66" FromRole="Trainer" ToRole="Carries" />
+          <NavigationProperty Name="USES" Relationship="Self.FK__USES__TrainerId__778AC167" FromRole="Trainer" ToRole="USES" />
+        </EntityType>
+        <EntityType Name="USES">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TrainerId" Type="Int32" Nullable="false" />
+          <Property Name="MoveId" Type="Int32" Nullable="false" />
+          <Property Name="PokemonId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Move" Relationship="Self.FK__USES__MoveId__787EE5A0" FromRole="USES" ToRole="Move" />
+          <NavigationProperty Name="Pokemon" Relationship="Self.FK__USES__PokemonId__797309D9" FromRole="USES" ToRole="Pokemon" />
+          <NavigationProperty Name="Trainer" Relationship="Self.FK__USES__TrainerId__778AC167" FromRole="USES" ToRole="Trainer" />
+        </EntityType>
+        <Association Name="FK__Carries__ItemId__6FE99F9F">
+          <End Role="Item" Type="Self.Item" Multiplicity="1" />
+          <End Role="Carries" Type="Self.Carries" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Item">
+              <PropertyRef Name="ItemId" />
+            </Principal>
+            <Dependent Role="Carries">
+              <PropertyRef Name="ItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Carries__Trainer__6EF57B66">
+          <End Role="Trainer" Type="Self.Trainer" Multiplicity="1" />
+          <End Role="Carries" Type="Self.Carries" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainer">
+              <PropertyRef Name="TrainerId" />
+            </Principal>
+            <Dependent Role="Carries">
+              <PropertyRef Name="TrainerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Evolution__Pokem__73BA3083">
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="1" />
+          <End Role="Evolution" Type="Self.Evolution" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pokemon">
+              <PropertyRef Name="PokemonId" />
+            </Principal>
+            <Dependent Role="Evolution">
+              <PropertyRef Name="PokemonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Item__RegionId__66603565">
+          <End Role="Region" Type="Self.Region" Multiplicity="0..1" />
+          <End Role="Item" Type="Self.Item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="RegionId" />
+            </Principal>
+            <Dependent Role="Item">
+              <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__MoveId__787EE5A0">
+          <End Role="Move" Type="Self.Move" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Move">
+              <PropertyRef Name="MoveId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="MoveId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Pokemon__RegionI__6B24EA82">
+          <End Role="Region" Type="Self.Region" Multiplicity="0..1" />
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="RegionId" />
+            </Principal>
+            <Dependent Role="Pokemon">
+              <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__PokemonId__797309D9">
+          <End Role="Pokemon" Type="Self.Pokemon" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pokemon">
+              <PropertyRef Name="PokemonId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="PokemonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__USES__TrainerId__778AC167">
+          <End Role="Trainer" Type="Self.Trainer" Multiplicity="1" />
+          <End Role="USES" Type="Self.USES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainer">
+              <PropertyRef Name="TrainerId" />
+            </Principal>
+            <Dependent Role="USES">
+              <PropertyRef Name="TrainerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PokemonEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Carries" EntityType="Self.Carries" />
+          <EntitySet Name="Evolution" EntityType="Self.Evolution" />
+          <EntitySet Name="Item" EntityType="Self.Item" />
+          <EntitySet Name="Move" EntityType="Self.Move" />
+          <EntitySet Name="Pokemon" EntityType="Self.Pokemon" />
+          <EntitySet Name="Region" EntityType="Self.Region" />
+          <EntitySet Name="Trainer" EntityType="Self.Trainer" />
+          <EntitySet Name="USES" EntityType="Self.USES" />
+          <AssociationSet Name="FK__Carries__ItemId__6FE99F9F" Association="Self.FK__Carries__ItemId__6FE99F9F">
+            <End Role="Item" EntitySet="Item" />
+            <End Role="Carries" EntitySet="Carries" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Carries__Trainer__6EF57B66" Association="Self.FK__Carries__Trainer__6EF57B66">
+            <End Role="Trainer" EntitySet="Trainer" />
+            <End Role="Carries" EntitySet="Carries" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Evolution__Pokem__73BA3083" Association="Self.FK__Evolution__Pokem__73BA3083">
+            <End Role="Pokemon" EntitySet="Pokemon" />
+            <End Role="Evolution" EntitySet="Evolution" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Item__RegionId__66603565" Association="Self.FK__Item__RegionId__66603565">
+            <End Role="Region" EntitySet="Region" />
+            <End Role="Item" EntitySet="Item" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__MoveId__787EE5A0" Association="Self.FK__USES__MoveId__787EE5A0">
+            <End Role="Move" EntitySet="Move" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Pokemon__RegionI__6B24EA82" Association="Self.FK__Pokemon__RegionI__6B24EA82">
+            <End Role="Region" EntitySet="Region" />
+            <End Role="Pokemon" EntitySet="Pokemon" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__PokemonId__797309D9" Association="Self.FK__USES__PokemonId__797309D9">
+            <End Role="Pokemon" EntitySet="Pokemon" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+          <AssociationSet Name="FK__USES__TrainerId__778AC167" Association="Self.FK__USES__TrainerId__778AC167">
+            <End Role="Trainer" EntitySet="Trainer" />
+            <End Role="USES" EntitySet="USES" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PokemonModelStoreContainer" CdmEntityContainer="PokemonEntities">
+          <EntitySetMapping Name="Carries">
+            <EntityTypeMapping TypeName="PokemonModel.Carries">
+              <MappingFragment StoreEntitySet="Carries">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TrainerId" ColumnName="TrainerId" />
+                <ScalarProperty Name="ItemId" ColumnName="ItemId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Evolution">
+            <EntityTypeMapping TypeName="PokemonModel.Evolution">
+              <MappingFragment StoreEntitySet="Evolution">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="PokemonId" ColumnName="PokemonId" />
+                <ScalarProperty Name="Evolved_form" ColumnName="Evolved_form" />
+                <ScalarProperty Name="Evolution_condition" ColumnName="Evolution_condition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Item">
+            <EntityTypeMapping TypeName="PokemonModel.Item">
+              <MappingFragment StoreEntitySet="Item">
+                <ScalarProperty Name="ItemId" ColumnName="ItemId" />
+                <ScalarProperty Name="ItemName" ColumnName="ItemName" />
+                <ScalarProperty Name="Effect" ColumnName="Effect" />
+                <ScalarProperty Name="Type_of_item" ColumnName="Type_of_item" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Move">
+            <EntityTypeMapping TypeName="PokemonModel.Move">
+              <MappingFragment StoreEntitySet="Move">
+                <ScalarProperty Name="MoveId" ColumnName="MoveId" />
+                <ScalarProperty Name="Move_name" ColumnName="Move_name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Types" ColumnName="Types" />
+                <ScalarProperty Name="overallStat" ColumnName="overallStat" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pokemon">
+            <EntityTypeMapping TypeName="PokemonModel.Pokemon">
+              <MappingFragment StoreEntitySet="Pokemon">
+                <ScalarProperty Name="PokemonId" ColumnName="PokemonId" />
+                <ScalarProperty Name="Pokemon_name" ColumnName="Pokemon_name" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+                <ScalarProperty Name="Health" ColumnName="Health" />
+                <ScalarProperty Name="Speed" ColumnName="Speed" />
+                <ScalarProperty Name="Attack" ColumnName="Attack" />
+                <ScalarProperty Name="Abilities" ColumnName="Abilities" />
+                <ScalarProperty Name="Height_weight" ColumnName="Height_weight" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Region">
+            <EntityTypeMapping TypeName="PokemonModel.Region">
+              <MappingFragment StoreEntitySet="Region">
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+                <ScalarProperty Name="RegionName" ColumnName="RegionName" />
+                <ScalarProperty Name="Number_of_pokemons" ColumnName="Number_of_pokemons" />
+                <ScalarProperty Name="Region_type" ColumnName="Region_type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Trainer">
+            <EntityTypeMapping TypeName="PokemonModel.Trainer">
+              <MappingFragment StoreEntitySet="Trainer">
+                <ScalarProperty Name="TrainerId" ColumnName="TrainerId" />
+                <ScalarProperty Name="Trainer_name" ColumnName="Trainer_name" />
+                <ScalarProperty Name="Trainer_class" ColumnName="Trainer_class" />
+                <ScalarProperty Name="Team_Badges" ColumnName="Team_Badges" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="USES">
+            <EntityTypeMapping TypeName="PokemonModel.USES">
+              <MappingFragment StoreEntitySet="USES">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TrainerId" ColumnName="TrainerId" />
+                <ScalarProperty Name="MoveId" ColumnName="MoveId" />
+                <ScalarProperty Name="PokemonId" ColumnName="PokemonId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

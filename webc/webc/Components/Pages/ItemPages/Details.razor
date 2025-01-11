@@ -1,0 +1,154 @@
+﻿@page "/items/details"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Item Details</PageTitle>
+
+<h1>Item Details</h1>
+
+@if (item is null)
+{
+        <div class="loading-container">
+            <p><em>Loading item details...</em></p>
+        </div>
+}
+else
+{
+        <div class="details-container">
+            <h2>🔍 Item Information</h2>
+            <p class="info-text">Here are the details for the selected item.</p>
+
+            <div class="item-details">
+                <dl>
+                    <dt>Item Name:</dt>
+                    <dd>@item.ItemName</dd>
+
+                    <dt>Effect:</dt>
+                    <dd>@item.Effect</dd>
+
+                    <dt>Type:</dt>
+                    <dd>@item.Type_of_item</dd>
+
+                    <dt>Region:</dt>
+                    <dd>@item.Region.RegionName</dd>
+                </dl>
+            </div>
+
+            <div class="action-links">
+                <a href="/items" class="btn btn-back">⬅ Back to List</a>
+            </div>
+        </div>
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #16a085;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-container {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #e74c3c;
+        padding: 20px;
+    }
+
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #f4f9f9, #e0f7f7);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .info-text {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .item-details {
+        text-align: left;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    dl {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 10px;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    dt {
+        font-weight: bold;
+        color: #555;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+    .action-links {
+        margin-top: 30px;
+    }
+
+    .btn-back {
+        display: inline-block;
+        background: #16a085;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #138d75;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(22, 160, 133, 0.3);
+    }
+
+    .keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code {
+    private Item? item;
+
+    [SupplyParameterFromQuery]
+    private int ItemId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Region.ToList();
+        item = await context.Item.FirstOrDefaultAsync(m => m.ItemId == ItemId);
+
+        if (item is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,114 @@
+﻿@page "/"
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.EntityFrameworkCore
+@using webc.Data
+@inject IDbContextFactory<webcContext> DbFactory
+
+<div class="page-container">
+    <h1 class="page-title">Pokémon Stats</h1>
+
+    <div class="chart-container">
+        <div class="chart-box">
+            <h3 class="chart-title">Pokémon by Region</h3>
+            <RadzenChart Style="width: 400px; height: 400px;">
+                <RadzenPieSeries Data="@pokemonByRegion" CategoryProperty="Label" ValueProperty="Value">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+
+        <div class="chart-box">
+            <h3 class="chart-title">Items by Region</h3>
+            <RadzenChart Style="width: 400px; height: 400px;">
+                <RadzenPieSeries Data="@itemsByRegion" CategoryProperty="Label" ValueProperty="Value">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ChartData> pokemonByRegion = new();
+    private List<ChartData> itemsByRegion = new();
+
+    public class ChartData
+    {
+        public string Label { get; set; } = string.Empty;
+        public float Value { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+
+        pokemonByRegion = await context.Pokemon
+            .Include(p => p.Region)
+            .GroupBy(p => p.Region.RegionName)
+            .Select(g => new ChartData
+                {
+                    Label = g.Key,
+                    Value = g.Count()
+                })
+            .ToListAsync();
+
+        itemsByRegion = await context.Item
+            .Include(i => i.Region)
+            .GroupBy(i => i.Region.RegionName)
+            .Select(g => new ChartData
+                {
+                    Label = g.Key,
+                    Value = g.Count()
+                })
+            .ToListAsync();
+    }
+}
+
+<PageTitle>Pokemon Statistics - Pokémon World</PageTitle>
+
+<style>
+    .page-container {
+        font-family: Arial, sans-serif;
+        margin: 2rem auto;
+        max-width: 1200px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+
+    .chart-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .chart-box {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        width: 500px;
+        height: 500px;
+    }
+
+    .chart-title {
+        font-size: 1.5rem;
+        color: #555;
+        margin-bottom: 1rem;
+    }
+
+    .media (max-width: 768px) {
+        .chart-box {
+            width: 100%;
+            height: auto;
+        }
+    }
+</style>

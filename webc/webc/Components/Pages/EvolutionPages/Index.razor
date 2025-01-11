@@ -1,0 +1,38 @@
+﻿@page "/evolutions"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Pok
+@using webc.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="evolutions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Evolution">
+    <PropertyColumn Property="evolution => evolution.PokemonId" />
+    <PropertyColumn Property="evolution => evolution.Evolved_form" />
+    <PropertyColumn Property="evolution => evolution.Evolution_condition" />
+
+    <TemplateColumn Context="evolution">
+        <a href="@($"evolutions/edit?id={evolution.Id}")">Edit</a> |
+        <a href="@($"evolutions/details?id={evolution.Id}")">Details</a> |
+        <a href="@($"evolutions/delete?id={evolution.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private webcContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

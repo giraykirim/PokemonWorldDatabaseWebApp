@@ -1,0 +1,174 @@
+﻿@page "/carries"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@using webc.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<webcContext> DbFactory
+
+<h1>Trainer Bags</h1>
+
+    <div class="align-right">
+    <a class="carry-card" href="carries/create">Add New Item to a Trainer's Bag</a>
+</div>
+
+@if (trainerGroups == null)
+{
+        <p>Loading...</p>
+}
+else
+{
+        <div class="trainer-group">
+        @foreach (var group in trainerGroups)
+        {
+                    <div class="trainer-section">
+                        <h2>@($"{group.TrainerName}'s Bag")</h2>
+                        <div class="carry-grid">
+                    @foreach (var carry in group.Carries)
+                    {
+                                    <div class="carry-card">
+                                        <p>Item: @carry.Item.ItemName</p>
+                                        <div class="action-buttons">
+                                            <a class="btn details" href="@($"carries/details?id={carry.Id}")">Details</a>
+                                            <a class="btn delete" href="@($"carries/delete?id={carry.Id}")">Delete Item from this Bag</a>
+                                        </div>
+                                    </div>
+                    }
+                        </div>
+                    </div>
+        }
+        </div>
+}
+
+@code {
+    private webcContext context = default!;
+    private List<TrainerGroup> trainerGroups;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+
+        
+        trainerGroups = await context.Carries
+            .Include(c => c.Trainer)
+            .Include(c => c.Item)
+            .AsNoTracking()
+            .GroupBy(c => new { c.Trainer.TrainerId, c.Trainer.Trainer_name })
+            .Select(g => new TrainerGroup
+                {
+                    TrainerId = g.Key.TrainerId,
+                    TrainerName = g.Key.Trainer_name,
+                    Carries = g.Select(c => c).ToList()
+                })
+            .ToListAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (context != null)
+        {
+            await context.DisposeAsync();
+        }
+    }
+
+    
+    private class TrainerGroup
+    {
+        public int TrainerId { get; set; }
+        public string TrainerName { get; set; }
+        public List<Carries> Carries { get; set; } = new();
+    }
+}
+
+<style>
+    
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #000000;
+        margin-top: 20px;
+    }
+
+    .trainer-group {
+        padding: 2rem;
+    }
+
+    .trainer-section {
+        margin-bottom: 3rem;
+    }
+
+        .trainer-section h2 {
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+    .carry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .carry-card {
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .carry-card:hover {
+            transform: scale(1.05);
+            box-shadow: 8px 8px 20px #c0c0c0, -8px -8px 20px #ffffff;
+        }
+
+        .carry-card p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+    .action-buttons {
+        margin-top: 15px;
+    }
+
+    .btn {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+        .btn.details {
+            background-color: #28a745;
+        }
+
+            .btn.details:hover {
+                background-color: #1e7e34;
+                transform: translateY(-2px);
+            }
+
+        .btn.delete {
+            background-color: #dc3545;
+        }
+
+            .btn.delete:hover {
+                background-color: #a71d2a;
+                transform: translateY(-2px);
+            }
+
+            .align-right {
+    text-align: right;
+    margin-bottom: 20px;
+}
+</style>

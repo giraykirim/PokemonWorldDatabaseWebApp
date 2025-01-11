@@ -1,0 +1,98 @@
+﻿@page "/evolutions/edit"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Evolution</h2>
+<hr />
+@if (Evolution is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Evolution" OnValidSubmit="UpdateEvolution" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Evolution.Id" value="@Evolution.Id" />
+                <div class="mb-3">
+                    <label for="pokemonid" class="form-label">PokemonId:</label>
+                    <InputNumber id="pokemonid" @bind-Value="Evolution.PokemonId" class="form-control" />
+                    <ValidationMessage For="() => Evolution.PokemonId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="evolved_form" class="form-label">Evolved_form:</label>
+                    <InputText id="evolved_form" @bind-Value="Evolution.Evolved_form" class="form-control" />
+                    <ValidationMessage For="() => Evolution.Evolved_form" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="evolution_condition" class="form-label">Evolution_condition:</label>
+                    <InputText id="evolution_condition" @bind-Value="Evolution.Evolution_condition" class="form-control" />
+                    <ValidationMessage For="() => Evolution.Evolution_condition" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/evolutions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Evolution? Evolution { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Evolution ??= await context.Evolution.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Evolution is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    
+    private async Task UpdateEvolution()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Evolution!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EvolutionExists(Evolution!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/evolutions");
+    }
+
+    private bool EvolutionExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Evolution.Any(e => e.Id == id);
+    }
+}

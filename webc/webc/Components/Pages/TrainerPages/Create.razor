@@ -1,0 +1,173 @@
+﻿@page "/trainers/create"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<h1>🧑‍🎓 Create Trainer</h1>
+<hr />
+
+<div class="form-container">
+    <EditForm Model="Trainer" OnValidSubmit="AddTrainer" class="form-content" FormName="create" Enhance>
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="form-group">
+            <label for="trainer_name" class="form-label">👤 Trainer Name:</label>
+            <InputText id="trainer_name" @bind-Value="Trainer.Trainer_name" class="form-input" placeholder="Enter trainer name" />
+            <ValidationMessage For="() => Trainer.Trainer_name" class="error-message" />
+        </div>
+
+        <div class="form-group">
+            <label for="trainer_class" class="form-label">🧢 Trainer Class:</label>
+            <InputText id="trainer_class" @bind-Value="Trainer.Trainer_class" class="form-input" placeholder="Enter trainer class" />
+            <ValidationMessage For="() => Trainer.Trainer_class" class="error-message" />
+        </div>
+
+        <div class="form-group">
+            <label for="team_badges" class="form-label">🏅 Team Badges:</label>
+            <InputText id="team_badges" @bind-Value="Trainer.Team_Badges" class="form-input" placeholder="Enter team badges" />
+            <ValidationMessage For="() => Trainer.Team_Badges" class="error-message" />
+        </div>
+
+        <div class="form-group">
+            <label for="gender" class="form-label">🚻 Gender:</label>
+            <InputSelect id="gender" @bind-Value="Trainer.Gender" class="form-input">
+                <option value="">-- Select Gender --</option>
+                <option value="M">Male ♂️</option>
+                <option value="F">Female ♀️</option>
+            </InputSelect>
+            <ValidationMessage For="() => Trainer.Gender" class="error-message" />
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">✅ Create</button>
+            <a href="/trainers" class="btn btn-secondary">❌ Cancel</a>
+        </div>
+    </EditForm>
+</div>
+
+<div>
+    <a href="/trainers" class="back-link">⬅ Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Trainer Trainer { get; set; } = new();
+
+    private async Task AddTrainer()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trainer.Add(Trainer);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/trainers");
+    }
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #4CAF50;
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background: linear-gradient(145deg, #e3f2fd, #ffffff);
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+    }
+
+    .form-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+        color: #333;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #4CAF50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .error-message {
+        font-size: 0.9rem;
+        color: #e74c3c;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(72, 239, 128, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e53935;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(244, 67, 54, 0.3);
+    }
+
+    .back-link {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        font-size: 1rem;
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>

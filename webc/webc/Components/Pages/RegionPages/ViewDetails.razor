@@ -1,0 +1,158 @@
+﻿@page "/regions/viewdetails"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Region Details</PageTitle>
+
+<h1>🌍 Region Details</h1>
+
+@if (region is null)
+{
+            <div class="loading-container">
+                <p><em>Loading region details...</em></p>
+            </div>
+}
+else
+{
+            <div class="details-container">
+                <h2>🌐 Region Information</h2>
+                <p class="info-text">Here are the details for the selected region.</p>
+
+                <div class="region-details">
+                    <dl>
+                        <dt>Region Name:</dt>
+                        <dd>@region.RegionName</dd>
+
+                        <dt>Number of Pokémon:</dt>
+                        <dd>@region.Number_of_pokemons</dd>
+
+                        <dt>Region Type:</dt>
+                        <dd>@region.Region_type</dd>
+                    </dl>
+                </div>
+
+                <div class="action-links">
+                    <a href="/viewregions" class="btn btn-back">⬅ Back to List</a>
+                </div>
+            </div>
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-container {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #e74c3c;
+        padding: 20px;
+    }
+
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #f4f9f9, #e0f7f7);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .info-text {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .region-details {
+        text-align: left;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    dl {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 10px;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    dt {
+        font-weight: bold;
+        color: #555;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+    .action-links {
+        margin-top: 30px;
+    }
+
+    .btn-back {
+        display: inline-block;
+        background: #2980b9;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #1f618d;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code {
+    private Region? region;
+
+    [SupplyParameterFromQuery]
+    private int RegionId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        region = await context.Region
+            .Select(r => new Region
+                {
+                    RegionId = r.RegionId,
+                    RegionName = r.RegionName,
+                    Region_type = r.Region_type,
+                    Number_of_pokemons = context.Pokemon.Count(p => p.RegionId == r.RegionId)
+                })
+            .FirstOrDefaultAsync(m => m.RegionId == RegionId);
+
+        if (region is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

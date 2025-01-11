@@ -1,0 +1,50 @@
+﻿@page "/evolutions/details"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Evolution</h2>
+    <hr />
+    @if (evolution is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">PokemonId</dt>
+            <dd class="col-sm-10">@evolution.PokemonId</dd>
+            <dt class="col-sm-2">Evolved_form</dt>
+            <dd class="col-sm-10">@evolution.Evolved_form</dd>
+            <dt class="col-sm-2">Evolution_condition</dt>
+            <dd class="col-sm-10">@evolution.Evolution_condition</dd>
+        </dl>
+        <div>
+            <a href="@($"/evolutions/edit?id={evolution.Id}")">Edit</a> |
+            <a href="@($"/evolutions")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Evolution? evolution;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        evolution = await context.Evolution.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (evolution is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

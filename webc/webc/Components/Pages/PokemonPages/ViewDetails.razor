@@ -1,0 +1,241 @@
+﻿@page "/pokemons/viewdetails"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Pokémon Details</PageTitle>
+
+<div class="pokemon-details-container">
+    @if (pokemon is null)
+    {
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Catching Pokémon data...</p>
+                    </div>
+    }
+    else
+    {
+                    <div class="pokemon-card">
+                        <div class="pokemon-header" style="background-color: @GetTypeColor(pokemon.Abilities.Split(',')[0])">
+                            <h1>@pokemon.Pokemon_name</h1>
+                            <span class="pokemon-id">#@pokemon.PokemonId</span>
+                        </div>
+                        <div class="pokemon-body">
+                            <div class="pokemon-image">
+                                <img src="@GetPokemonImage(pokemon.Pokemon_name)" alt="@pokemon.Pokemon_name" />
+                            </div>
+                            <div class="pokemon-info">
+                                <div class="stat-group">
+                                    <div class="stat">
+                                        <span class="stat-label">Health</span>
+                                        <div class="stat-bar">
+                                            <div class="stat-fill" style="width: @(pokemon.Health)%"></div>
+                                        </div>
+                                        <span class="stat-value">@pokemon.Health</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Speed</span>
+                                        <div class="stat-bar">
+                                            <div class="stat-fill" style="width: @(pokemon.Speed)%"></div>
+                                        </div>
+                                        <span class="stat-value">@pokemon.Speed</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Attack</span>
+                                        <div class="stat-bar">
+                                            <div class="stat-fill" style="width: @(pokemon.Attack)%"></div>
+                                        </div>
+                                        <span class="stat-value">@pokemon.Attack</span>
+                                    </div>
+                                </div>
+                                <div class="pokemon-details">
+                                    <p><strong>Region:</strong> @pokemon.Region.RegionName</p>
+                                    <p><strong>Abilities:</strong> @pokemon.Abilities</p>
+                                    <p><strong>Height/Weight:</strong> @pokemon.Height_weight</p>
+                                    <p><strong>Level:</strong> @pokemon.Level</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pokemon-footer">
+                                
+                                <a class="btn btn-secondary" href="/viewpokemons">Back to List</a>
+                        </div>
+                    </div>
+    }
+</div>
+
+<style>
+    .pokemon-details-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        
+        font-family: 'Arial', sans-serif;
+    }
+
+    .loading-spinner {
+        text-align: center;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    .keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .pokemon-card {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        overflow: hidden;
+        width: 90%;
+        max-width: 600px;
+    }
+
+    .pokemon-header {
+        color: white;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+    }
+
+    .pokemon-header h1 {
+        margin: 0;
+        font-size: 2.5em;
+    }
+
+    .pokemon-id {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.2em;
+        opacity: 0.8;
+    }
+
+    .pokemon-body {
+        display: flex;
+        padding: 20px;
+    }
+
+    .pokemon-image {
+        flex: 1;
+        text-align: center;
+    }
+
+    .pokemon-image img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .pokemon-info {
+        flex: 2;
+        padding-left: 20px;
+    }
+
+    .stat-group {
+        margin-bottom: 20px;
+    }
+
+    .stat {
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-weight: bold;
+    }
+
+    .stat-bar {
+        background-color: #e0e0e0;
+        height: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .stat-fill {
+        height: 100%;
+        background-color: #4caf50;
+    }
+
+    .pokemon-details p {
+        margin: 5px 0;
+    }
+
+    .pokemon-footer {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+        margin-left: 10px;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+</style>
+
+@code {
+    private Pokemon? pokemon;
+
+    [SupplyParameterFromQuery]
+    private int PokemonId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Region.ToList();
+        pokemon = await context.Pokemon.FirstOrDefaultAsync(m => m.PokemonId == PokemonId);
+
+        if (pokemon is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private string GetTypeColor(string type)
+    {
+        return type.ToLower() switch
+        {
+            "fire" => "#FF4136",
+            "water" => "#0074D9",
+            "grass" => "#2ECC40",
+            "electric" => "#FFDC00",
+            _ => "#7FDBFF",
+        };
+    }
+
+ 
+
+    private string GetPokemonImage(string pokemonName)
+    {
+        
+        return $"https://img.pokemondb.net/artwork/large/{pokemonName.ToLower()}.jpg";
+    }
+}

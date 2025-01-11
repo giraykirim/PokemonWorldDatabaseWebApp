@@ -1,0 +1,208 @@
+﻿@page "/uses/create"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create a New USE</PageTitle>
+
+<h1>Create a New USE</h1>
+
+<div class="create-form-container">
+    <EditForm Model="USES" OnValidSubmit="AddUSES" class="uses-form" FormName="createUSES">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+                <div class="alert alert-danger">
+                @ErrorMessage
+                </div>
+        }
+
+        
+        <div class="form-group">
+            <label for="trainerid">🎓 Trainer:</label>
+            <InputSelect id="trainerid" @bind-Value="USES.TrainerId" class="form-control animated-input">
+                <option value="">-- Select a Trainer --</option>
+                @foreach (var trainer in Trainers)
+                {
+                        <option value="@trainer.TrainerId">@trainer.Trainer_name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => USES.TrainerId" />
+        </div>
+
+        
+        <div class="form-group">
+            <label for="moveid">⚔ Move:</label>
+            <InputSelect id="moveid" @bind-Value="USES.MoveId" class="form-control animated-input">
+                <option value="">-- Select a Move --</option>
+                @foreach (var move in Moves)
+                {
+                        <option value="@move.MoveId">@move.Move_name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => USES.MoveId" />
+        </div>
+
+        
+        <div class="form-group">
+            <label for="pokemonid">✨ Pokémon:</label>
+            <InputSelect id="pokemonid" @bind-Value="USES.PokemonId" class="form-control animated-input">
+                <option value="">-- Select a Pokémon --</option>
+                @foreach (var pokemon in Pokemons)
+                {
+                        <option value="@pokemon.PokemonId">@pokemon.Pokemon_name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => USES.PokemonId" />
+        </div>
+
+        
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-create">🚀 Create USE</button>
+            <a href="/uses" class="btn btn-cancel">⬅ Cancel</a>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private USES USES { get; set; } = new();
+
+    private List<Trainer> Trainers { get; set; } = new();
+    private List<Move> Moves { get; set; } = new();
+    private List<Pokemon> Pokemons { get; set; } = new();
+
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        
+        Trainers = await context.Trainer.OrderBy(t => t.Trainer_name).ToListAsync();
+        Moves = await context.Move.OrderBy(m => m.Move_name).ToListAsync();
+        Pokemons = await context.Pokemon.OrderBy(p => p.Pokemon_name).ToListAsync();
+    }
+
+    private async Task AddUSES()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+       
+        var existingUSES = await context.USES
+            .FirstOrDefaultAsync(u => u.TrainerId == USES.TrainerId
+                                   && u.PokemonId == USES.PokemonId
+                                   && u.MoveId == USES.MoveId);
+
+        if (existingUSES != null)
+        {
+            
+            ErrorMessage = "A USE record with this Trainer-Pokémon-Move combination already exists.";
+            return;
+        }
+
+        
+        context.USES.Add(USES);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/uses");
+    }
+}
+
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #673ab7;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .create-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #f9f9f9, #e6e6e6);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        animation: fadeIn 1s ease-out;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .animated-input:focus {
+        border-color: #673ab7;
+        box-shadow: 0 0 10px rgba(103, 58, 183, 0.5);
+        outline: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-create {
+        background-color: #673ab7;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+
+    }
+
+    .btn-create:hover {
+        background-color: #5e35b1;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(103, 58, 183, 0.3);
+    }
+
+    .btn-cancel {
+        background-color: #9e9e9e;
+        color: #fff;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        background-color: #757575;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(158, 158, 158, 0.3);
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+        color: #e91e63;
+    }
+
+    
+</style>

@@ -1,0 +1,54 @@
+﻿@page "/evolutions/create"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Evolution</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Evolution" OnValidSubmit="AddEvolution" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="pokemonid" class="form-label">PokemonId:</label> 
+                <InputNumber id="pokemonid" @bind-Value="Evolution.PokemonId" class="form-control" /> 
+                <ValidationMessage For="() => Evolution.PokemonId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="evolved_form" class="form-label">Evolved_form:</label> 
+                <InputText id="evolved_form" @bind-Value="Evolution.Evolved_form" class="form-control" /> 
+                <ValidationMessage For="() => Evolution.Evolved_form" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="evolution_condition" class="form-label">Evolution_condition:</label> 
+                <InputText id="evolution_condition" @bind-Value="Evolution.Evolution_condition" class="form-control" /> 
+                <ValidationMessage For="() => Evolution.Evolution_condition" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/evolutions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Evolution Evolution { get; set; } = new();
+
+    
+    private async Task AddEvolution()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Evolution.Add(Evolution);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/evolutions");
+    }
+}

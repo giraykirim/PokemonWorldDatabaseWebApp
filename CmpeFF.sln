@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pok", "Pok\Pok.csproj", "{4D4D37ED-C91D-4FB3-891B-46CB0ADBBEA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webc", "webc\webc\webc.csproj", "{991D908B-1FA5-4DE9-8902-F4B431619272}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webc.Client", "webc\webc.Client\webc.Client.csproj", "{564B164F-0F3E-4A49-910F-7F13B24B0B4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4D4D37ED-C91D-4FB3-891B-46CB0ADBBEA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D4D37ED-C91D-4FB3-891B-46CB0ADBBEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D4D37ED-C91D-4FB3-891B-46CB0ADBBEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D4D37ED-C91D-4FB3-891B-46CB0ADBBEA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{991D908B-1FA5-4DE9-8902-F4B431619272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{991D908B-1FA5-4DE9-8902-F4B431619272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{991D908B-1FA5-4DE9-8902-F4B431619272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{991D908B-1FA5-4DE9-8902-F4B431619272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{564B164F-0F3E-4A49-910F-7F13B24B0B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{564B164F-0F3E-4A49-910F-7F13B24B0B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{564B164F-0F3E-4A49-910F-7F13B24B0B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{564B164F-0F3E-4A49-910F-7F13B24B0B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

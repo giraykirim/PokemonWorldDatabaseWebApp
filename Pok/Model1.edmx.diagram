@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="a707b41e937844aaad38471bfd316bd2" Name="Diagram1">
+        <EntityTypeShape EntityType="PokemonModel.Carries" Width="1.5" PointX="5.25" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Evolution" Width="1.5" PointX="5.25" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Item" Width="1.5" PointX="3" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Move" Width="1.5" PointX="3" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Pokemon" Width="1.5" PointX="3" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Region" Width="1.5" PointX="0.75" PointY="4.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.Trainer" Width="1.5" PointX="3" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PokemonModel.USES" Width="1.5" PointX="5.25" PointY="8.875" IsExpanded="true" />
+        <AssociationConnector Association="PokemonModel.FK__Carries__ItemId__6FE99F9F" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__Carries__Trainer__6EF57B66" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__Evolution__Pokem__73BA3083" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__Item__RegionId__66603565" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__USES__MoveId__787EE5A0" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__Pokemon__RegionI__6B24EA82" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__USES__PokemonId__797309D9" ManuallyRouted="false" />
+        <AssociationConnector Association="PokemonModel.FK__USES__TrainerId__778AC167" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

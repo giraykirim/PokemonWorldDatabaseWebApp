@@ -1,0 +1,106 @@
+﻿@page "/client"
+@using webc.Data
+@using Pok
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+<PageTitle>Home - Pokémon World</PageTitle>
+
+<h1>Welcome to Pokémon World</h1>
+
+<h2>Client Section</h2>
+<p>Welcome, User! Use the links below to view resources.</p>
+
+
+<div class="grid">
+    <a href="/viewpokemons" class="card">
+        <img src="pokemonn.gif" alt="Pokemon Icon" >
+        <h2>View Pokémon</h2>
+        <p>Check out Pokémon species</p>
+    </a>
+    <a href="/viewCarries" class="card">
+        <img src="backpack.png" alt="Bag Icon" >
+        <h2>View Bags</h2>
+        <p>Look at items in bags</p>
+    </a>
+    <a href="/viewitems" class="card">
+        <img src="pokeball.png" alt="Item Icon" >
+        <h2>View Items</h2>
+        <p>See Pokémon items</p>
+    </a>
+    <a href="/viewtrainers" class="card">
+        <img src="trainerr.gif" alt="Trainer Icon" >
+        <h2>View Trainers</h2>
+        <p> Learn about trainer details</p>
+    </a>
+    <a href="/viewmoves" class="card">
+        <img src="moves.gif" alt="Moves Icon" >
+        <h2>View Moves</h2>
+        <p> Dive into Pokémon moves</p>
+    </a>
+    <a href="/viewregions" class="card">
+        <img src="map.png" alt="Map Icon" >
+        <h2>View Regions</h2>
+        <p> Check out regions</p>
+    </a>
+    <a href="/viewuses" class="card">
+         <img src="uses.gif" alt="Uses Icon" >
+        <h2>View Move Combinations</h2>
+        <p> Look at Pokémon-trainer move sets</p>
+    </a>
+</div>
+
+<div class="card mt-4">
+    <h2>Pokémon World Statistics</h2>
+    @if (isLoading)
+    {
+                <p>Loading...</p>
+    }
+    else
+    {
+                <p>Total Pokémon: @pokemonCount</p>
+                <p>Total Trainers: @trainerCount</p>
+                <p>Total Regions: 4</p>
+    }
+</div>
+
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        padding: 1rem;
+        text-decoration: none;
+        color: inherit;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private int pokemonCount;
+    private int trainerCount;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
+        pokemonCount = await dbContext.Pokemon.CountAsync();
+        trainerCount = await dbContext.Trainer.CountAsync();
+        isLoading = false;
+    }
+}
+
+
+
+<PageTitle>Client - Pokémon World</PageTitle>
+

@@ -1,0 +1,223 @@
+﻿@page "/items/edit"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Item</h2>
+<hr />
+@if (Item is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (Regions is null)
+{
+    <p><em>Loading regions...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Item" OnValidSubmit="UpdateItem" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Item.ItemId" value="@Item.ItemId" />
+                <div class="mb-3">
+                    <label for="itemname" class="form-label">Item Name:</label>
+                    <InputText id="itemname" @bind-Value="Item.ItemName" class="form-control" />
+                    <ValidationMessage For="() => Item.ItemName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="effect" class="form-label">Effect:</label>
+                    <InputText id="effect" @bind-Value="Item.Effect" class="form-control" />
+                    <ValidationMessage For="() => Item.Effect" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="type_of_item" class="form-label">Type of Item:</label>
+                    <InputText id="type_of_item" @bind-Value="Item.Type_of_item" class="form-control" />
+                    <ValidationMessage For="() => Item.Type_of_item" class="text-danger" />
+                </div>
+
+                <!-- Updated Region Selection -->
+                <div class="mb-3">
+                    <label for="regionid" class="form-label">Region:</label>
+                    <InputSelect id="regionid" @bind-Value="Item.RegionId" class="form-control">
+                        <option value="">-- Select a Region --</option>
+                        @foreach (var region in Regions)
+                        {
+                            <option value="@region.RegionId">@region.RegionName</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Item.RegionId" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/items">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int ItemId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Item? Item { get; set; }
+
+    private List<Region>? Regions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Item ??= await context.Item.FirstOrDefaultAsync(m => m.ItemId == ItemId);
+
+        if (Item is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        
+        Regions = await context.Region.OrderBy(r => r.RegionName).ToListAsync();
+    }
+
+    private async Task UpdateItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Item!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ItemExists(Item!.ItemId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/items");
+    }
+
+    private bool ItemExists(int itemid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Item.Any(e => e.ItemId == itemid);
+    }
+}
+
+             <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 2px solid #007bff;
+            margin-bottom: 30px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .col-md-4 {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>

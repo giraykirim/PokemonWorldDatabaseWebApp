@@ -1,0 +1,244 @@
+﻿@page "/pokemons/edit"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Pokemon</h2>
+<hr />
+@if (Pokemon is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (Regions is null)
+{
+    <p><em>Loading regions...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Pokemon" OnValidSubmit="UpdatePokemon" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Pokemon.PokemonId" value="@Pokemon.PokemonId" />
+                <div class="mb-3">
+                        <label for="pokemon_name" class="form-label">✨ Pokemon Name:</label>
+                    <InputText id="pokemon_name" @bind-Value="Pokemon.Pokemon_name" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Pokemon_name" class="text-danger" />
+                </div>
+
+                <!-- Region Dropdown -->
+                <div class="mb-3">
+                        <label for="regionid" class="form-label">🌍 Region:</label>
+                    <InputSelect id="regionid" @bind-Value="Pokemon.RegionId" class="form-control">
+                        <option value="">-- Select a Region --</option>
+                        @foreach (var region in Regions)
+                        {
+                            <option value="@region.RegionId">@region.RegionName</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Pokemon.RegionId" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                        <label for="health" class="form-label">❤️ Health:</label>
+                    <InputNumber id="health" @bind-Value="Pokemon.Health" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Health" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                        <label for="speed" class="form-label">⚡ Speed:</label>
+                    <InputNumber id="speed" @bind-Value="Pokemon.Speed" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Speed" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                        <label for="attack" class="form-label">💥 Attack:</label>
+                    <InputNumber id="attack" @bind-Value="Pokemon.Attack" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Attack" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                        <label for="abilities" class="form-label">🔮 Abilities:</label>
+                    <InputText id="abilities" @bind-Value="Pokemon.Abilities" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Abilities" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                        <label for="height_weight" class="form-label">📏 Height/Weight:</label>
+                    <InputNumber id="height_weight" @bind-Value="Pokemon.Height_weight" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Height_weight" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                        <label for="level" class="form-label">⭐ Level:</label>
+                    <InputNumber id="level" @bind-Value="Pokemon.Level" class="form-control" />
+                    <ValidationMessage For="() => Pokemon.Level" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/pokemons">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int PokemonId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Pokemon? Pokemon { get; set; }
+
+    private List<Region>? Regions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        
+        Pokemon ??= await context.Pokemon.FirstOrDefaultAsync(m => m.PokemonId == PokemonId);
+
+        if (Pokemon is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        
+        Regions = await context.Region.OrderBy(r => r.RegionName).ToListAsync();
+    }
+
+    private async Task UpdatePokemon()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Pokemon!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PokemonExists(Pokemon!.PokemonId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/pokemons");
+    }
+
+    private bool PokemonExists(int pokemonid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Pokemon.Any(e => e.PokemonId == pokemonid);
+    }
+}
+
+        <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 2px solid #007bff;
+            margin-bottom: 30px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .col-md-4 {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>

@@ -1,0 +1,33 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+    <a href="/">
+        <img src="pikachu.png" style="display: block;" alt="Pokemon World">
+    </a>
+    <a class="navbar-brand" href="/">Pokemon World</a>
+</div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span  class="fas fa-chart-pie me-2"  </span>  Pokemon Statistics
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Admin">
+                <span class="fa-solid fa-users-gear me-2" </span> Admin
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Client">
+                <span class="fa-solid fa-address-card me-2" ></span> Client
+            </NavLink>
+        </div>
+    </nav>
+</div>
+

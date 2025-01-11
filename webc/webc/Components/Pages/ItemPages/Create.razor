@@ -1,0 +1,178 @@
+﻿@page "/items/create"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Item</PageTitle>
+
+<h1>Create a New Item</h1>
+
+<div class="create-form-container">
+    <EditForm Model="@Item" OnValidSubmit="AddItem" class="item-form" FormName="createItemForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="form-group">
+            <label for="itemname">🏷️ Item Name:</label>
+            <InputText id="itemname" @bind-Value="Item.ItemName" class="form-control animated-input" />
+            <ValidationMessage For="() => Item.ItemName" />
+        </div>
+
+        <div class="form-group">
+            <label for="effect">✨ Effect:</label>
+            <InputText id="effect" @bind-Value="Item.Effect" class="form-control animated-input" />
+            <ValidationMessage For="() => Item.Effect" />
+        </div>
+
+        <div class="form-group">
+            <label for="type_of_item">📦 Type of Item:</label>
+            <InputText id="type_of_item" @bind-Value="Item.Type_of_item" class="form-control animated-input" />
+            <ValidationMessage For="() => Item.Type_of_item" />
+        </div>
+
+        <div class="form-group">
+            <label for="regionid">🌍 Region:</label>
+            <InputSelect id="regionid" @bind-Value="Item.RegionId" class="form-control animated-input">
+                <option value="">-- Select a Region --</option>
+                @foreach (var region in Regions)
+                {
+                        <option value="@region.RegionId">@region.RegionName</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Item.RegionId" />
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-create">✨ Create Item</button>
+            <a href="/items" class="btn btn-cancel">🚪 Cancel</a>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Item Item { get; set; } = new();
+
+    private List<Region> Regions { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Regions = await context.Region.OrderBy(r => r.RegionName).ToListAsync();
+    }
+
+    private async Task AddItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Item.Add(Item);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/items");
+    }
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #007bff;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+    .create-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #fff, #f0f0f0);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        animation: fadeIn 1s ease-out;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    label {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .animated-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        outline: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-create {
+        background: linear-gradient(90deg, #007bff, #6610f2);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-create:hover {
+        background: linear-gradient(90deg, #6610f2, #007bff);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(102, 16, 242, 0.3);
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

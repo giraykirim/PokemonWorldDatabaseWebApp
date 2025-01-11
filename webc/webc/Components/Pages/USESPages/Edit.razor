@@ -1,0 +1,242 @@
+﻿@page "/uses/edit"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>USES</h2>
+<hr />
+@if (USES is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (Trainers == null || Moves == null || Pokemons == null)
+{
+    <p><em>Loading data...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="USES" OnValidSubmit="UpdateUSES" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="USES.Id" value="@USES.Id" />
+
+                
+                <div class="mb-3">
+                    <label for="trainerid" class="form-label">Trainer:</label>
+                    <InputSelect id="trainerid" @bind-Value="USES.TrainerId" class="form-control">
+                        <option value="">-- Select a Trainer --</option>
+                        @foreach (var trainer in Trainers)
+                        {
+                            <option value="@trainer.TrainerId">@trainer.Trainer_name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => USES.TrainerId" class="text-danger" />
+                </div>
+
+                
+                <div class="mb-3">
+                    <label for="moveid" class="form-label">Move:</label>
+                    <InputSelect id="moveid" @bind-Value="USES.MoveId" class="form-control">
+                        <option value="">-- Select a Move --</option>
+                        @foreach (var move in Moves)
+                        {
+                            <option value="@move.MoveId">@move.Move_name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => USES.MoveId" class="text-danger" />
+                </div>
+
+             
+                <div class="mb-3">
+                    <label for="pokemonid" class="form-label">Pokémon:</label>
+                    <InputSelect id="pokemonid" @bind-Value="USES.PokemonId" class="form-control">
+                        <option value="">-- Select a Pokémon --</option>
+                        @foreach (var pokemon in Pokemons)
+                        {
+                            <option value="@pokemon.PokemonId">@pokemon.Pokemon_name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => USES.PokemonId" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/uses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private USES? USES { get; set; }
+
+    private List<Trainer>? Trainers { get; set; }
+    private List<Move>? Moves { get; set; }
+    private List<Pokemon>? Pokemons { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        
+        USES ??= await context.USES.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (USES is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        
+        Trainers = await context.Trainer.OrderBy(t => t.Trainer_name).ToListAsync();
+        Moves = await context.Move.OrderBy(m => m.Move_name).ToListAsync();
+        Pokemons = await context.Pokemon.OrderBy(p => p.Pokemon_name).ToListAsync();
+    }
+
+    private async Task UpdateUSES()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(USES!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!USESExists(USES!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/uses");
+    }
+
+    private bool USESExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.USES.Any(e => e.Id == id);
+    }
+}
+
+<PageTitle>Edit Move Combinations - Pokémon World</PageTitle>
+
+         <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 2px solid #007bff;
+            margin-bottom: 30px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .col-md-4 {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>

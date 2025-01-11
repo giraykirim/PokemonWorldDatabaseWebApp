@@ -1,0 +1,106 @@
+﻿@page "/admin"
+@using webc.Data
+@using Pok
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+<PageTitle>Home - Pokémon World</PageTitle>
+
+<h1>Welcome to Pokémon World</h1>
+
+<h2>Admin Section</h2>
+<p>Welcome, Admin! Use the links below to manage resources.</p>
+
+
+<div class="grid">
+    <a href="/pokemons" class="card">
+        <img src="pokemonn.gif" alt="Pokemon Icon" >
+        <h2>Manage Pokémon</h2>
+        <p>View and edit Pokémon species</p>
+    </a>
+    <a href="/Carries" class="card">
+        <img src="backpack.png" alt="Bag Icon" >
+        <h2>Manage Bags</h2>
+        <p>Organize items in bags</p>
+    </a>
+    <a href="/items" class="card">
+        <img src="pokeball.png" alt="Item Icon" >
+        <h2>Manage Items</h2>
+        <p>View and edit Pokémon items</p>
+    </a>
+    <a href="/trainers" class="card">
+        <img src="trainerr.gif" alt="Trainer Icon" >
+        <h2>Manage Trainers</h2>
+        <p>View and edit trainer details</p>
+    </a>
+    <a href="/moves" class="card">
+        <img src="moves.gif" alt="Moves Icon" >
+        <h2>Manage Moves</h2>
+        <p>View and edit Pokémon moves</p>
+    </a>
+    <a href="/regions" class="card">
+        <img src="map.png" alt="Map Icon" >
+        <h2>Manage Regions</h2>
+        <p>View and edit regions</p>
+    </a>
+    <a href="/uses" class="card">
+        <img src="uses.gif" alt="Uses Icon" >
+        <h2>Manage Move Combinations</h2>
+        <p>Handle Pokémon-trainer move sets</p>
+    </a>
+</div>
+
+<div class="card mt-4">
+    <h2>Pokémon World Statistics</h2>
+    @if (isLoading)
+    {
+                <p>Loading...</p>
+    }
+    else
+    {
+                <p>Total Pokémon: @pokemonCount</p>
+                <p>Total Trainers: @trainerCount</p>
+                <p>Total Regions: 4</p>
+    }
+</div>
+
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        padding: 1rem;
+        text-decoration: none;
+        color: inherit;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private int pokemonCount;
+    private int trainerCount;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
+        pokemonCount = await dbContext.Pokemon.CountAsync();
+        trainerCount = await dbContext.Trainer.CountAsync();
+        isLoading = false;
+    }
+}
+
+
+
+<PageTitle>Admin - Pokémon World</PageTitle>
+

@@ -1,0 +1,162 @@
+﻿@page "/trainers"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@using webc.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<webcContext> DbFactory
+
+<h1>Trainers and Their Bags and Pokémons</h1>
+
+<div class="align-right">
+    <a class="trainer-card" href="trainers/create">Create New Trainer</a>
+</div>
+
+<div class="trainer-grid">
+    @foreach (var trainer in trainers)
+    {
+            <div class="trainer-card">
+                <h3>@trainer.Trainer.Trainer_name</h3>
+                <p>Class: @trainer.Trainer.Trainer_class</p>
+                <p>Team Badges: @trainer.Trainer.Team_Badges</p>
+                <p>Gender: @trainer.Trainer.Gender</p>
+                <p>Items in The Trainer's Bag: @string.Join(", ", trainer.Items.Select(i => i.ItemName))</p>
+                <p>Pokémon: @string.Join(", ", trainer.Pokemons.Select(p => p.Pokemon_name))</p>
+                <div class="action-buttons">
+                    <a class="btn edit" href="@($"trainers/edit?trainerid={trainer.Trainer.TrainerId}")">Edit</a>
+                    <a class="btn details" href="@($"trainers/details?trainerid={trainer.Trainer.TrainerId}")">Details</a>
+                    <a class="btn delete" href="@($"trainers/delete?trainerid={trainer.Trainer.TrainerId}")">Delete</a>
+                </div>
+            </div>
+    }
+</div>
+
+@code {
+    private webcContext context = default!;
+    private List<TrainerViewModel> trainers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = await DbFactory.CreateDbContextAsync();
+        trainers = await context.Trainer
+            .Select(t => new TrainerViewModel
+                {
+                    Trainer = t,
+                    Items = (from c in context.Carries
+                             join i in context.Item on c.ItemId equals i.ItemId
+                             where c.TrainerId == t.TrainerId
+                             select i).ToList(),
+                    Pokemons = (from u in context.USES
+                                join p in context.Pokemon on u.PokemonId equals p.PokemonId
+                                where u.TrainerId == t.TrainerId
+                                // Group by Pokémon name and select the first one in each group
+                                select p)
+                                   .GroupBy(p => p.Pokemon_name)
+                                   .Select(g => g.First())
+                                   .ToList()
+                })
+            .ToListAsync();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    public class TrainerViewModel
+    {
+        public Trainer Trainer { get; set; } = default!;
+        public List<Item> Items { get; set; } = new();
+        public List<Pokemon> Pokemons { get; set; } = new();
+    }
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #000000;
+        margin-top: 20px;
+    }
+
+    .trainer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+      .align-right {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+
+    .trainer-card {
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .trainer-card:hover {
+        transform: scale(1.05);
+        box-shadow: 8px 8px 20px #c0c0c0, -8px -8px 20px #ffffff;
+    }
+
+    .trainer-card h3 {
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .trainer-card p {
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .action-buttons {
+        margin-top: 15px;
+    }
+
+    .btn {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn.edit {
+        background-color: #007bff;
+    }
+
+    .btn.edit:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn.details {
+        background-color: #28a745;
+    }
+
+    .btn.details:hover {
+        background-color: #1e7e34;
+        transform: translateY(-2px);
+    }
+
+    .btn.delete {
+        background-color: #dc3545;
+    }
+
+    .btn.delete:hover {
+        background-color: #a71d2a;
+        transform: translateY(-2px);
+    }
+</style>

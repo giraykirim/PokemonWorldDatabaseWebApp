@@ -1,0 +1,151 @@
+﻿@page "/uses/details"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>USE Details</PageTitle>
+
+<h1>USE Details</h1>
+
+@if (uses is null)
+{
+        <div class="loading-container">
+            <p><em>Loading USE details...</em></p>
+        </div>
+}
+else
+{
+        <div class="details-container">
+            <h2>🔍 USE Information</h2>
+            <p class="info-text">Here are the details for the selected USE.</p>
+
+            <div class="use-details">
+                <dl>
+                    <dt>Trainer:</dt>
+                    <dd>@uses.Trainer.Trainer_name</dd>
+
+                    <dt>Move:</dt>
+                    <dd>@uses.Move.Move_name</dd>
+
+                    <dt>Pokémon:</dt>
+                    <dd>@uses.Pokemon.Pokemon_name</dd>
+                </dl>
+            </div>
+
+            <div class="action-links">
+                <a href="/uses" class="btn btn-back">⬅ Back to List</a>
+            </div>
+        </div>
+}
+
+<PageTitle>Details Move Combinations - Pokémon World</PageTitle>
+
+<style>
+    
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-container {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #e74c3c;
+        padding: 20px;
+    }
+
+   
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #f4f9f9, #e0f7f7);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .info-text {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+   
+    .use-details {
+        text-align: left;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    dl {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 10px;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    dt {
+        font-weight: bold;
+        color: #555;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+   
+    .action-links {
+        margin-top: 30px;
+    }
+
+    .btn-back {
+        display: inline-block;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    
+    }
+</style>
+
+@code {
+    private USES? uses;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trainer.ToList();
+        context.Move.ToList();
+        context.Pokemon.ToList();
+        uses = await context.USES.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (uses is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

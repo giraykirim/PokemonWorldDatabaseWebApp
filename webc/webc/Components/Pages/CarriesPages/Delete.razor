@@ -1,0 +1,195 @@
+﻿@page "/Carries/delete"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<h1>Delete Carry</h1>
+
+@if (Carries is null)
+{
+        <div class="loading-container">
+            <p><em>Loading Carry details...</em></p>
+        </div>
+}
+else
+{
+        <div class="delete-confirm-container">
+            <h2>⚠ Are you sure you want to delete this Carry?</h2>
+            <p class="warning-text">This action is irreversible and will remove all related data.</p>
+
+            <div class="carry-details">
+                <dl>
+                    <dt>Trainer:</dt>
+                    <dd>@Carries.Trainer.Trainer_name</dd>
+
+                    <dt>Item:</dt>
+                    <dd>@Carries.Item.ItemName</dd>
+                </dl>
+            </div>
+
+            <EditForm method="post" Model="Carries" OnValidSubmit="DeleteCarries" FormName="deleteCarries">
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-danger delete-button" disabled="@(Carries is null)">🗑 Delete</button>
+                    <a href="/Carries" class="btn btn-cancel">🚪 Cancel</a>
+                </div>
+            </EditForm>
+        </div>
+}
+
+<div>
+    <a href="/Carries" class="back-link">⬅ Back to List</a>
+</div>
+
+@code {
+    private Carries? Carries;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trainer.ToList();
+        context.Item.ToList();
+        Carries = await context.Carries.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Carries is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteCarries()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Carries.Remove(Carries!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/Carries");
+    }
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #e91e63;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+    .loading-container {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #ff5722;
+        padding: 20px;
+    }
+
+    .delete-confirm-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #f8d7da, #f1c0c4);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .warning-text {
+        font-size: 1.2rem;
+        color: #e74c3c;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .carry-details {
+        text-align: left;
+        margin-top: 20px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    dl {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 10px;
+    }
+
+    dt {
+        font-weight: bold;
+        color: #555;
+    }
+
+    dd {
+        margin: 0;
+        color: #333;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .delete-button {
+        background: linear-gradient(90deg, #e91e63, #c0392b);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .delete-button:hover {
+        background: linear-gradient(90deg, #c0392b, #e91e63);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .back-link {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        font-size: 1rem;
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

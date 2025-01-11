@@ -1,0 +1,194 @@
+﻿@page "/Carries/create"
+@using Microsoft.EntityFrameworkCore
+@using Pok
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Carries</PageTitle>
+
+<h1>Add a New Item to the Bag</h1>
+
+<div class="create-form-container">
+    <EditForm Model="@carries" OnValidSubmit="AddCarries" class="carries-form" FormName="createCarriesForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+                    <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+        }
+
+        <div class="form-group">
+            <label for="trainerid">👨‍🏫 Trainer:</label>
+            <InputSelect id="trainerid" @bind-Value="carries.TrainerId" class="form-control animated-input">
+                <option value="">-- Select a Trainer --</option>
+                @foreach (var trainer in Trainers)
+                {
+                            <option value="@trainer.TrainerId">@trainer.Trainer_name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => carries.TrainerId" />
+        </div>
+
+        <div class="form-group">
+            <label for="itemid">🎒 Item:</label>
+            <InputSelect id="itemid" @bind-Value="carries.ItemId" class="form-control animated-input">
+                <option value="">-- Select an Item --</option>
+                @foreach (var item in Items)
+                {
+                            <option value="@item.ItemId">@item.ItemName</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => carries.ItemId" />
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-create">✨ Create Carry</button>
+            <a href="/Carries" class="btn btn-cancel">🚪 Cancel</a>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Carries carries { get; set; } = new();
+
+    private List<Trainer> Trainers { get; set; } = new();
+    private List<Item> Items { get; set; } = new();
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        Trainers = await context.Trainer.OrderBy(t => t.Trainer_name).ToListAsync();
+        Items = await context.Item.OrderBy(i => i.ItemName).ToListAsync();
+    }
+
+    private async Task AddCarries()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        
+        var existingCarry = await context.Carries
+            .FirstOrDefaultAsync(c => c.TrainerId == carries.TrainerId && c.ItemId == carries.ItemId);
+
+        if (existingCarry != null)
+        {
+            
+            ErrorMessage = "This trainer already has this item assigned.";
+            return;
+        }
+
+        
+        context.Carries.Add(carries);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/Carries");
+    }
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #007bff;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+    .create-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(145deg, #fff, #f0f0f0);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.8);
+        animation: fadeIn 1s ease-out;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    label {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .animated-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        outline: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-create {
+        background: linear-gradient(90deg, #007bff, #6610f2);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-create:hover {
+        background: linear-gradient(90deg, #6610f2, #007bff);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(102, 16, 242, 0.3);
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

@@ -1,0 +1,164 @@
+﻿@page "/pokemons"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Pok
+@using webc.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<webc.Data.webcContext> DbFactory
+
+<h1>Pokémon Cards</h1>
+
+<div class="align-right">
+    <a class="pokemon-card" href="pokemons/create">Create New</a>
+</div>
+
+<div class="pokemon-grid">
+    @foreach (var pokemon in context.Pokemon)
+    {
+            <div class="pokemon-card">
+                <img src="@GetPokemonImage(pokemon.Pokemon_name)" alt="@pokemon.Pokemon_name" class="pokemon-image" />
+                    <h3>@pokemon.Pokemon_name</h3>
+                        <p>🌍 Region: @pokemon.Region.RegionName</p>
+                    <p>❤️ Health: @pokemon.Health</p>
+                    <p>⚡ Speed: @pokemon.Speed</p>
+                    <p>💥 Attack: @pokemon.Attack</p>
+                    <p>🔮 Abilities: @pokemon.Abilities</p>
+                    <p>📏 Height & Weight: @pokemon.Height_weight</p>
+                    <p>⭐ Level: @pokemon.Level</p>
+                <div class="action-buttons">
+                         <a class="btn edit" href="@($"pokemons/edit?pokemonid={pokemon.PokemonId}")">Edit</a>
+                         <a class="btn details" href="@($"pokemons/details?pokemonid={pokemon.PokemonId}")">Details</a>
+                         <a class="btn delete" href="@($"pokemons/delete?pokemonid={pokemon.PokemonId}")">Delete</a>
+                             <a class="btn evolve" href="@($"pokemons/evolve?pokemonid={pokemon.PokemonId}")">Evolve</a>
+                </div>
+            </div>
+    }
+</div>
+
+@code {
+    private webcContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+        context.Region.ToList();
+    }
+
+    private string GetPokemonImage(string pokemonName)
+    {
+        
+        return $"https://img.pokemondb.net/artwork/large/{pokemonName.ToLower()}.jpg";
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #000000;
+        margin-top: 20px;
+    }
+
+    .pokemon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+      .align-right {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+    .pokemon-card {
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .pokemon-card:hover {
+        transform: scale(1.05);
+        box-shadow: 8px 8px 20px #c0c0c0, -8px -8px 20px #ffffff;
+    }
+
+    .pokemon-card h3 {
+        color: #ff5722;
+        margin-bottom: 10px;
+    }
+
+    .pokemon-card p {
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .pokemon-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .action-buttons {
+        margin-top: 15px;
+    }
+
+    .btn {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn.evolve {
+    background-color: #ff9800;
+}
+
+.btn.evolve:hover {
+    background-color: #e67e22;
+    transform: translateY(-2px);
+}
+
+    .btn.edit {
+        background-color: #007bff;
+    }
+
+    .btn.edit:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn.details {
+        background-color: #28a745;
+    }
+
+    .btn.details:hover {
+        background-color: #1e7e34;
+        transform: translateY(-2px);
+    }
+
+    .btn.delete {
+        background-color: #dc3545;
+    }
+
+    .btn.delete:hover {
+        background-color: #a71d2a;
+        transform: translateY(-2px);
+    }
+</style>
